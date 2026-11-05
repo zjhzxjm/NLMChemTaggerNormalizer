@@ -29,21 +29,22 @@ class PubTatorDocumentProcessor:
 		with codecs.open(input_filename, 'r', encoding="utf-8") as input_file:
 			current_document = None
 			for line in input_file:
-				line = line.strip()
+				line = line.rstrip("\r\n")
 				if len(line) == 0:
 					continue
-				if line.find("|t|") > -1:
+				header = line.split("|", 2)
+				if len(header) == 3 and header[1] == "t":
 					# Handle previous document
 					if not current_document is None:
 						documents.append(current_document)
 					current_document = PubTatorDocument()
 					# Handle title
-					fields = line.split("|")
+					fields = line.split("|", 2)
 					current_document.id = fields[0]
 					current_document.title = fields[2]
-				elif line.find("|a|") > -1:
+				elif len(header) == 3 and header[1] == "a":
 					# Handle abstract
-					fields = line.split("|")
+					fields = line.split("|", 2)
 					current_document.abstract = fields[2]
 				else:
 					# Handle annotation

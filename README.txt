@@ -20,3 +20,21 @@ Internally the scripts use several variables:
 Installation:
 This code is tested with Python 3.9.18
 The requirements.txt includes the Python packages needed
+
+Prome integration branch
+========================
+The main branch preserves the original third-party mirror. Its 45 source,
+configuration and documentation files were verified byte-identical to the
+NLMChemTaggerNormalizer archive in https://zenodo.org/records/10839631
+(archive MD5 e687bfc27848cbd1d650da85ef226897).
+
+The prome branch keeps integration fixes and contract tests here. Dictionary
+resources are installed separately at CHEM_NORM/data (a directory or symlink);
+the prome branch does not track or fetch them through Git LFS.
+
+For PubTator, run_Chemical_PubTator.sh also accepts the installation directory
+as its fourth argument. Input, abbreviations and output remain the first
+three arguments. TSV abbreviations are explicit and scoped to document IDs.
+
+Run contract tests in an environment with the listed requirements:
+  python -m unittest discover -s tests -v

@@ -1,3 +1,6 @@
+#!/bin/bash
+set -e
+
 #source .env/bin/activate
 export PYTHONIOENCODING=utf8
 #export PYTHONPATH=.:$PYTHONPATH
@@ -19,7 +22,7 @@ if [[ -d ${INPUT} ]]; then
 	#rm -f ${OUTPUT}/*
 fi
 
-python -u src/normalize.py config_CHEM_MESH_2023.json ${FORMAT} ${ABBR} ${INPUT} ${OUTPUT}
+python -u src/normalize.py config_CHEM_MESH_2023.json "${FORMAT}" "${ABBR}" "${INPUT}" "${OUTPUT}"
 #deactivate
 
 date

@@ -18,11 +18,11 @@ class AbbreviationExpander:
 			dir = os.listdir(path)
 			for item in dir:
 				if os.path.isfile(path + "/" + item):
-					self.load_file(path + "/" + item)				
-		elif os.path.isfile(path):  
+					self.load_file(path + "/" + item)
+		elif os.path.isfile(path):
 			# load directly
 			self.load_file(path)
-		else:  
+		else:
 			raise RuntimeError("Path is not a directory or normal file: " + path)
 
 	def load_file(self, filename):
@@ -37,9 +37,9 @@ class AbbreviationExpander:
 		print("Loading abbreviations from TSV file " + filename)
 		count = 0
 		if filename.endswith(".gz"):
-			file = gzip.open(filename, 'rt', encoding="utf-8") 
+			file = gzip.open(filename, 'rt', encoding="utf-8")
 		else:
-			file = codecs.open(filename, 'r', encoding="utf-8") 
+			file = codecs.open(filename, 'r', encoding="utf-8")
 		for line in file:
 			line = line.strip()
 			if len(line) == 0:
@@ -50,15 +50,14 @@ class AbbreviationExpander:
 				short = fields[1]
 				long = fields[2]
 				self.add(document_ID, short, long)
-				# Handle plural abbreviations
-				if short.endswith("s") and long.endswith("s"):
-					self.add(document_ID, short[:-1], long[:-1])
+				# TSV definitions are already conflict-filtered. Do not infer aliases
+				# that could override explicit definitions or reintroduce skipped forms.
 				count += 1
 			except:
 				print("Abbreviation line malformed: \"{}\"".format(line))
 		file.close()
 		print("Loaded " + str(count) + " abbreviations")
-	
+
 	def load_biocxml(self, filename):
 		print("Loading abbreviations from BioC file " + filename)
 		count = 0
@@ -90,7 +89,7 @@ class AbbreviationExpander:
 					else:
 						print("WARN Could not identify long form & short form for document " + document.id + " relation " + relation.id)
 		print("Loaded " + str(count) + " abbreviations")
-	
+
 	def add(self, document_ID, short, long):
 		if not document_ID in self.abbr_dict:
 			self.abbr_dict[document_ID] = dict()
@@ -106,7 +105,7 @@ class AbbreviationExpander:
 				previous_count = self.get_abbr_freq(short, previous_long)
 				print("WARN Abbreviation \"" + short + "\" -> \"" + long + "\" (count "+str(count)+") is already defined as \"" + previous_long + "\" (count "+str(previous_count)+")")
 				if count > previous_count:
-					doc_dict[short] = long			
+					doc_dict[short] = long
 		else:
 			doc_dict[short] = long
 
@@ -130,7 +129,8 @@ class AbbreviationExpander:
 		return updated
 
 	def expand(self, document_ID, text):
-		if not document_ID in self.abbr_dict:
+		# Automatic definitions are scoped to the actual PubTator document ID.
+		if document_ID not in self.abbr_dict:
 			return text
 		doc_list = list(self.abbr_dict[document_ID].items())
 		used = [False] * len(doc_list)
@@ -145,4 +145,3 @@ class AbbreviationExpander:
 						result = updated
 						used[index] = True
 		return result
-
